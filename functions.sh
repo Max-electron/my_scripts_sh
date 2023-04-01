@@ -40,3 +40,4 @@ _bash () {
 }
 
 _bash "lscpu"
+_bash "free -h" 
