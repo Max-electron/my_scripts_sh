@@ -38,3 +38,5 @@ _bash () {
   ${1};
   [ $? -ne 0 ] && _show_error $BASH_ERR_CODE "bash command failed"
 }
+
+_bash "lscpu"
