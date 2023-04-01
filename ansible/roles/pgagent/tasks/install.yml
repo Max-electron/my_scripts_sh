@@ -1,0 +1,128 @@
+---
+
+- name: Репозиторий для зависимостей
+  shell:
+    cmd: wget https://repofiles.repo.corp.tander.ru/repofiles/yum/OEL8/oracle-linux-ol8.repo -O /etc/yum.repos.d/oracle-linux-ol8.repo
+
+- name: Репозиторий для зависимостей
+  shell:
+    cmd: wget https://repofiles.repo.corp.tander.ru/repofiles/yum/CentOS7/CentOS-SCL.repo -O /etc/yum.repos.d/CentOS-SCL.repo
+
+
+- name: Установка пакета pgagent
+  yum:
+    name: pgagent_{{ postgresql_version }}
+    state: present
+
+- name: Установка pg_agent.conf
+  template:
+    src: templates/pg_agent.conf.j2
+    dest: /etc/pgagent/pgagent_{{postgresql_version}}.conf
+    mode: '644'
+    owner: postgres
+    group: postgres
+
+- name: Включить демон и добавить в автозагрузку
+  systemd:
+    name: pgagent_{{postgresql_version}}
+    state: started
+    enabled: yes
+
+- name: Создание директории
+  file:
+    path: /var/log/pgagent
+    state: directory
+    mode: g+w
+    owner: postgres
+    group: postgres
+
+- name: Установить расширение pgagent
+  postgresql_ext:
+    name: pgagent
+    db: "{{ dbname }}"
+    state: present
+
+- name: Создать роль pgagent
+  postgresql_user:
+    name: pgagent
+    password: "pgagent"
+    role_attr_flags: LOGIN,INHERIT
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
+  
+- name: Выдать привилегии usage
+  postgresql_privs:
+    db: "{{ dbname }}"
+    state: present
+    privs: usage
+    role: pgagent
+    objs: pgagent
+    type: schema
+
+- name: Выдать привилегии на tables
+  postgresql_privs:
+    db: "{{ dbname }}"
+    schema: pgagent
+    privs: ALL
+    state: present
+    type: table
+    role: pgagent
+    objs: ALL_IN_SCHEMA
+
+- name: Выдать привилегии на  sequence
+  postgresql_privs:
+    db: "{{ dbname }}"
+    schema: pgagent
+    privs: ALL
+    state: present
+    type: sequence
+    role: pgagent
+    objs: ALL_IN_SCHEMA
+
+- name: Выдать привилегии на CONNECT TEMP to database
+  postgresql_privs:
+    db: "{{ dbname }}"
+    privs: CONNECT,TEMP
+    state: present
+    type: database
+    role: pgagent
+    
+- name: Создание pgpass из template
+  template:
+    src: templates/.pgpass.j2
+    dest: /var/lib/pgsql/.pgpass
+    mode: '600'
+    owner: postgres
+    group: postgres
+
+- name: Pgagent primary connection
+  shell:
+    cmd: /usr/bin/pgagent_{{ postgresql_version }} -f -l 2 host=127.0.0.1 port=5432 user=pgagent dbname={{ dbname }}
+  ignore_errors: yes
+
+- name: Create <service>.service.d directory
+  file:
+    path: /etc/systemd/system/pgagent_{{ postgresql_version}}.service.d/
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy <service>.service drop-in
+  template:
+    src: templates/override.conf.j2
+    dest: /etc/systemd/system/pgagent_{{ postgresql_version}}.service.d/override.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Включить демон и добавить в автозагрузку
+  systemd:
+    name: pgagent_{{ postgresql_version}}
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+
+
+

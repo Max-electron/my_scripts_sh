@@ -1,0 +1,11 @@
+---
+
+- hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    dbname: test
+
+
+  roles:
+    - install_system_cicd_install

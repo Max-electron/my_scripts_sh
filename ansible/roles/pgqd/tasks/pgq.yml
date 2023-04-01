@@ -1,0 +1,9 @@
+---
+
+- name: Установка пакетов
+  yum:
+    name:
+      - "pgq_{{ postgresql_version }}"
+      - "skytools-96"
+    state: present
+

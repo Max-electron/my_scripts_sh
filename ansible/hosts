@@ -1,0 +1,20 @@
+
+[pgbadgerweb]
+#10.5.4.121 #ansible_ssh_user=kuznetcov_ma ansible_ssh_pass= ansible_sudo_pass=
+#v00pgtestoel8.corp.tander.ru
+
+10.9.39.1:22
+#10.5.98.228
+
+#10.5.98.229
+
+
+
+[master]
+
+#
+
+[replica]
+
+#
+

@@ -1,0 +1,14 @@
+---
+
+- name: Создать роль install
+  postgresql_user:
+    name: install
+    password: "install"
+    role_attr_flags: LOGIN
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
+
+- name: Создать роль installsys
+  postgresql_user:
+    name: installsys
+    role_attr_flags: SUPERUSER

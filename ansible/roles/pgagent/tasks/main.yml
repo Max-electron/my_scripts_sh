@@ -1,0 +1,8 @@
+---
+# tasks file for pgagent
+
+
+
+- include_tasks: grants.yml
+- include_tasks: install.yml
+

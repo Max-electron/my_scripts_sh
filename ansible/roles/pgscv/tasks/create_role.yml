@@ -1,0 +1,41 @@
+---
+
+- name: Установка пакетов
+  yum:
+    name: python-psycopg2
+    state: present
+
+
+- name: Создать роль pgscv
+  postgresql_user:
+    name: pgscv
+    password: "{{ password }}"
+    role_attr_flags: LOGIN
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
+
+
+- name: Привилегии для пользователя pgscv
+  postgresql_privs:
+    type: group
+    obj: pg_read_server_files,pg_monitor
+    role: pgscv
+    db: postgres
+
+- name: Привилегии для пользователя pgscv
+  postgresql_privs:
+    type: function
+    privs: EXECUTE
+    obj: pg_current_logfile()
+    role: pgscv
+    schema: pg_catalog
+    db: postgres
+
+- name: Привилегии для пользователя pgscv                         
+  postgresql_privs:                                               
+    type: function                                                
+    privs: EXECUTE                                                
+    obj: pg_current_logfile()
+    role: postgres
+    schema: pg_catalog                                              
+    db: postgres

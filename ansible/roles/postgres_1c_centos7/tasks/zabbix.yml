@@ -1,0 +1,37 @@
+--- 
+
+- name: Остановить Zabbix agent 1
+  service: name="zabbix-agent" state=stopped
+
+- name: Удалить Zabbix agent 1
+  yum:
+    name: zabbix-agent
+    state: absent
+
+- name: Установить репозиторий zabbix5
+  shell: "wget https://repofiles.repo.corp.tander.ru/repofiles/yum/Zabbix/zabbix5.repo -O /etc/yum.repos.d/zabbix5.repo"
+
+- name: Установка пакета zabbix-agent2
+  yum:
+    name:
+      - "zabbix-agent2"
+    state: present
+
+#- name: Остановить Zabbix agent 2
+ # service: name="zabbix-agent2" state=stopped
+
+- name: Удалить старый конфиг файл
+  file:
+    path: /etc/zabbix/zabbix_agent2.conf
+    state: absent
+
+- name: Установка нового конфига Zabbix
+  template:
+    src: templates/zabbix_agent2.conf.j2
+    dest: /etc/zabbix/zabbix_agent2.conf
+    mode: '644'
+    owner: root
+    group: root
+
+- name: Включение сервиса и добавление автозапуска
+  service: name="zabbix-agent2" state=restarted enabled=yes

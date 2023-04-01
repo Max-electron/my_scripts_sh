@@ -1,0 +1,12 @@
+---
+
+- hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    postgresql_version: 14
+    dbname: miasdb
+
+
+  roles:
+    - oracle_fdw

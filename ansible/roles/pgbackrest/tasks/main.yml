@@ -1,0 +1,12 @@
+---
+# tasks file for pgbackrest
+
+- include_tasks: 1c_preconfig.yml
+#- include_tasks: install.yml
+#- include_tasks: create_pg_stat_tmp.yml
+#- include_tasks: pg_hba.yml
+#- include_tasks: configure.yml
+#- include_tasks: users.yml
+#- include_tasks: networker.yml
+#- include_tasks: zabbix.yml
+##- include_tasks: extensions.yml

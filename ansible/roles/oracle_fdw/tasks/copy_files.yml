@@ -1,0 +1,23 @@
+---
+
+- name: Копирование файла oracle_fdw на целевой хост
+  copy:
+    src: files/oracle_fdw-ORACLE_FDW_2_4_0
+    dest: /database
+    owner: postgres
+    group: postgres
+
+- name: Копирование файлов oracle client на целевой хост
+  copy:
+    src: files/oracle-instantclient19.9-basic-19.9.0.0.0-1.x86_64.rpm
+    dest: /database
+    owner: postgres
+    group: postgres
+
+- name: Копирование файлов oracle client 2 на целевой хост
+  copy:
+    src: files/oracle-instantclient19.9-devel-19.9.0.0.0-1.x86_64.rpm
+    dest: /database
+    owner: postgres
+    group: postgres
+

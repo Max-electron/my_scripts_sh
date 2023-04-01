@@ -1,0 +1,12 @@
+---
+
+- hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    dbname: postgres
+    postgresql_version: 14
+    password: pgagent # для пользователя БД
+
+  roles:
+    - pgagent

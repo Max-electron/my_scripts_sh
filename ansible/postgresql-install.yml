@@ -1,0 +1,19 @@
+---
+
+- hosts: all
+  become: true
+  gather_facts: true
+  vars: 
+    postgresql_version: 14
+    port_pg: 5432
+#    postgresql_drop_old_cluster: yes
+    shared_buffers: "{{ (ansible_memtotal_mb/4) | int }}"
+    effective_cache_size: "{{ (ansible_memtotal_mb*0.75) | int }}"
+    max_worker_processes: "{{ ansible_processor_vcpus | int }}"
+    max_parallel_workers: "{{ ansible_processor_vcpus | int }}"
+    hostname: "{{ ansible_nodename }}"
+    autovacuum_max_workers: "{{ ansible_processor_vcpus/2 | int }}"
+
+
+  roles:
+    - postgres_oel8 

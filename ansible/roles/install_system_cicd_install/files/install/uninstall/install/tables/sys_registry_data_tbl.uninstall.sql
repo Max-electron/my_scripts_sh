@@ -1,0 +1,1 @@
+drop table install.sys_registry_data_tbl;

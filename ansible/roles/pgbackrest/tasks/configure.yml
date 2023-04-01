@@ -1,0 +1,30 @@
+---
+
+- name: Установка параметров
+  community.postgresql.postgresql_set:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+  loop:
+    - { name: 'archive_command', value: 'pgbackrest --stanza={{ stanza }} archive-push %p' }
+    - { name: 'archive_mode', value: 'on'}
+    - { name: 'wal_level', value: 'replica'}
+    - { name: 'max_wal_senders', value: '10'}
+
+- name: Рестарт ПГ
+  service: name="postgresql-{{postgresql_version}}" state=restarted
+
+- name: Создать Stanza
+  shell:
+    cmd: pgbackrest --stanza={{ stanza }} stanza-create
+  remote_user: postgres
+
+- name: Установка задачи в cron
+  cron:
+    name: backup pgbackrest
+    hour: '1'
+#    weekday: '6'
+    user: postgres
+    job: "pgbackrest --type=full --stanza={{ stanza }} backup"
+
+
+

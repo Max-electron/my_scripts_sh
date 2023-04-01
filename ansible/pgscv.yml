@@ -1,0 +1,11 @@
+---
+
+- hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    password: sfdkgji6876754
+    dbname: postgres
+
+  roles:
+    - pgscv

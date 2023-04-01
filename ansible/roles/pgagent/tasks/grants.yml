@@ -1,0 +1,57 @@
+---
+
+- name: Создать роль pgagent
+  postgresql_user:
+    name: pgagent
+    password: "pgagent"
+    role_attr_flags: LOGIN,INHERIT
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
+
+- name: Выдать привилегии usage
+  postgresql_privs:
+    db: "{{ dbname }}"
+    state: present
+    privs: USAGE
+    schema: pgagent
+    role: pgagent
+    objs: ALL_IN_SCHEMA
+
+- name: Выдать привилегии на tables
+  postgresql_privs:
+    db: "{{ dbname }}"
+    schema: pgagent
+    privs: ALL
+    state: present
+    type: table
+    role: pgagent
+    objs: ALL_IN_SCHEMA
+
+- name: Выдать привилегии на  sequence
+  postgresql_privs:
+    db: "{{ dbname }}"
+    schema: pgagent
+    privs: ALL
+    state: present
+    type: sequence
+    role: pgagent
+    objs: ALL_IN_SCHEMA
+
+- name: Выдать привилегии на CONNECT TEMP to database
+  postgresql_privs:
+    db: "{{ dbname }}"
+    privs: CONNECT,TEMP
+    state: present
+    type: database
+    role: pgagent
+
+- name: Создание pgpass из template
+  template:
+    src: templates/.pgpass.j2
+    dest: /var/lib/pgsql/.pgpass
+    mode: '600'
+    owner: postgres
+    group: postgres
+
+
+

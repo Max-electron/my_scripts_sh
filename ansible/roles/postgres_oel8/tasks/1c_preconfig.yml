@@ -1,0 +1,61 @@
+---
+
+- name: "create a directory for tuned"
+  file:
+    path: /usr/lib/tuned/1c-performance
+    state: directory
+    mode: '0755'
+
+- name: "configure tuned"
+  template:
+    src: tuned.conf.j2
+    dest: /usr/lib/tuned/1c-performance/tuned.conf
+  register: tuned_result
+
+- name: "apply the 1c-preformance profile"
+  shell:
+    tuned-adm profile 1c-performance
+  register: tuned_profile_result
+  when: tuned_result is changed
+
+- name: "restart tuned"
+  systemd:
+    name: tuned
+    state: restarted
+    enabled: true
+  when: tuned_profile_result is changed
+
+- name: "configure Hugepage Grub for CentOS or OracleLinux"
+  replace:
+    path: /etc/default/grub
+    regexp: "quiet(.*)$"
+    replace: 'quiet transparent_hugepage=never"'
+  register: grub_result
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" or ansible_distribution == "OracleLinux"
+
+- name: "check bios LEGACY or UEFI"
+  stat:
+    path: /sys/firmware/efi
+  register: bios_result
+
+- name: "configure grub for LEGACY"
+  shell:
+    grub2-mkconfig -o /boot/grub2/grub.cfg
+  register: grub_result
+  when: bios_result.stat.exists == false and ansible_distribution == "CentOS" or ansible_distribution == "OracleLinux" and grub_result is changed
+
+- name: "configure grub for UEFI"
+  shell:
+    grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+  register: grub_result
+  when: bios_result.stat.exists == true and ansible_distribution == "CentOS" or ansible_distribution == "OracleLinux" and grub_result is changed
+
+- name: "change to NOOP mode"
+  shell:
+    grubby --update-kernel=ALL --args="elevator=noop"
+  when: grub_result is changed and ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" or ansible_distribution == "OracleLinux"
+
+- name: "reboot the server"
+  reboot:
+    reboot_timeout: 3600
+

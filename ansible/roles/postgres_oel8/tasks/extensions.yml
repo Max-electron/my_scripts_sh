@@ -1,0 +1,7 @@
+---
+
+- name: Установка pg_stat_statements
+  lineinfile:
+    path: /var/lib/pgsql/{{ postgresql_version }}/data/postgresql.conf
+    regexp: "^#?shared_preload_libraries = .*$"
+    line: shared_preload_libraries = 'online_analyze,plantuner'  

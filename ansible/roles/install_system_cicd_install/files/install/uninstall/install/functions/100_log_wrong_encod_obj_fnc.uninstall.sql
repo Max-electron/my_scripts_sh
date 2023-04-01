@@ -1,0 +1,1 @@
+drop function if exists install.log_wrong_encod_obj_fnc(varchar, install.upgrade_log_row);

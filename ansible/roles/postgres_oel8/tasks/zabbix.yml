@@ -1,0 +1,20 @@
+--- 
+
+- name: Остановить Zabbix agent
+  service: name="zabbix-agent2" state=stopped 
+
+- name: Удалить старый конфиг файл
+  file:
+    path: /etc/zabbix/zabbix_agent2.conf
+    state: absent
+
+- name: Установка нового конфига Zabbix
+  template:
+    src: templates/zabbix_agent2.conf.j2
+    dest: /etc/zabbix/zabbix_agent2.conf
+    mode: '644'
+    owner: root
+    group: root
+
+- name: Включение сервиса и добавление автозапуска
+  service: name="zabbix-agent2" state=restarted enabled=yes

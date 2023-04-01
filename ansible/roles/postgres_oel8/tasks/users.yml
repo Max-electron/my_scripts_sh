@@ -1,0 +1,76 @@
+---
+
+- name: Создать пользователя для Zabbix monitoring
+  postgresql_user:
+    name: zbx_monitor
+    password: "fdgdf45345"
+    role_attr_flags: INHERIT
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
+
+- name: Привилегии для пользователя Zabbix
+  postgresql_privs:
+    type: function
+    privs: EXECUTE
+    obj: pg_ls_dir(text),pg_stat_file(text),pg_ls_waldir()
+    role: zbx_monitor
+    schema: pg_catalog
+    db: postgres
+
+- name: Создать пользователя Лошаков М.А.
+  postgresql_user:
+    name: loshakov_ma
+    password: "Asgard2002"
+    role_attr_flags: SUPERUSER
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
+
+- name: Создать пользователя Кузнецов М.А.
+  postgresql_user:
+    name: kuznetcov_ma
+    password: "PhiLmor9021+"
+    role_attr_flags: SUPERUSER
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
+
+- name: Отозвать привилегии роли public в схеме public
+  postgresql_privs:
+    db: template1
+    state: absent
+    privs: CREATE
+    objs: ALL_IN_SCHEMA
+    role: PUBLIC
+
+- name: Создать роль pgscv
+  postgresql_user:
+    name: pgscv
+    password: "sfdkgji6876754"
+    role_attr_flags: LOGIN
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
+
+
+- name: Привилегии для пользователя pgscv
+  postgresql_privs:
+    type: group
+    obj: pg_read_server_files,pg_monitor
+    role: pgscv
+    db: postgres
+
+- name: Привилегии для пользователя pgscv
+  postgresql_privs:
+    type: function
+    privs: EXECUTE
+    obj: pg_current_logfile()
+    role: pgscv
+    schema: pg_catalog
+    db: postgres
+
+- name: Привилегии для пользователя pgscv
+  postgresql_privs:
+    type: function
+    privs: EXECUTE
+    obj: pg_current_logfile()
+    role: postgres
+    schema: pg_catalog
+    db: postgres

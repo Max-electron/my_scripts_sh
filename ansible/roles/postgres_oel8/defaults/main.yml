@@ -1,0 +1,6 @@
+---
+# defaults file for postgres_oel8
+
+# Базовые переменные 
+
+#postgresql_version: 14

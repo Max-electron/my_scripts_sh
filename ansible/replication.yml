@@ -1,0 +1,23 @@
+---
+
+- hosts: master
+  become: true
+  gather_facts: true
+  vars:
+    postgresql_version: 14
+    ip_replica: 
+    password_replica: 
+  tasks:
+    - 
+    -
+
+
+- hosts: replica
+  become: true
+  gather_facts: true
+  vars:
+    postgresql_version: 14
+    dbname: crcPGdev
+  roles:
+    - 
+

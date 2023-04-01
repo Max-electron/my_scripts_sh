@@ -1,0 +1,9 @@
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+local	all		all					trust
+host    all             +ldapusers	0.0.0.0/0               ldap ldapserver=adldap.corp.tander.ru ldapport=636 ldapscheme=ldaps ldapprefix="CN=" ldapsuffix=",OU=Users,OU=gk,DC=corp,DC=tander,DC=ru"
+host	all		all		0.0.0.0/0		scram-sha-256
+local   replication     all                                     peer
+host    replication     all             127.0.0.1/32            ident
+host    replication     all             ::1/128                 ident
+
+
