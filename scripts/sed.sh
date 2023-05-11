@@ -1,0 +1,7 @@
+sed -i "s/shared_buffers = 128MB/shared_buffers = 2GB/g" "${PGDATA}/postgresql.conf"
+sed -i "s/#effective_cache_size = 4GB/effective_cache_size = 6GB/g" "${PGDATA}/postgresql.conf"
+sed -i "s/#work_mem = 4MB/work_mem = 10MB/g" "${PGDATA}/postgresql.conf"
+sed -i "/shared_buffers/d" "${PGDATA}/postgresql.auto.conf"
+sed -i "/effective_cache_size/d" "${PGDATA}/postgresql.auto.conf"
+sed -i "/work_mem/d" "${PGDATA}/postgresql.auto.conf"
+sed -i "s/ldapserver=adldap.corp.tander.ru ldapport=636 ldapscheme=ldaps ldapprefix/ldapserver=v00adtest1.corp.tander.ru ldapport=389 ldapprefix/g" "${PGDATA}/pg_hba.conf"
