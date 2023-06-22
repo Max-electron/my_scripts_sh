@@ -1,7 +1,0 @@
----
-# tasks file for oracle_fdw
-
-- include_tasks: copy_files.yml
-- include_tasks: install.yml
-- include_tasks: delete_files.yml
-

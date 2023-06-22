@@ -1,8 +1,0 @@
----
-# tasks file for install_system_cicd_install
-
-- include_tasks: create_role.yml
-- include_tasks: create_schema.yml
-- include_tasks: copy_files.yml
-- include_tasks: grants.yml
-- include_tasks: delete_files.yml

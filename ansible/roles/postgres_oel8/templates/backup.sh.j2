@@ -1,9 +1,0 @@
-#!/bin/sh
-( set -x; /usr/pgsql-{{ postgresql_version }}/bin/pg_basebackup -p 5432 --format=tar --wal-method=fetch --checkpoint=fast --pgdata=$OAPP_MOUNT_DIR/basebackup )
-rc=$?
-if [ $rc == 0 ]; then
-echo "Continued processing with the returned value $rc."
-else
-        echo "Exited processing with the returned value $rc."
-        exit $rc
-fi

@@ -1,1 +1,0 @@
-drop function if exists install.change_owner_for_schema_objects_fnc(text, text);

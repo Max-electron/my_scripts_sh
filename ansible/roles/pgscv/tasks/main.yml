@@ -1,5 +1,0 @@
----
-# tasks file for pgscv
-
-#- include_tasks: create_role.yml
-- include_tasks: install_bin.yml

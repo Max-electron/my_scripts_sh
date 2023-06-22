@@ -1,1 +1,0 @@
-drop function if exists install.log_fk_no_indx_fnc(varchar, install.upgrade_log_row);

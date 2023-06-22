@@ -1,1 +1,0 @@
-drop view install.fk_no_index_vw;
