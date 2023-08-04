@@ -1,0 +1,61 @@
+#!/bin/bash
+
+##########################################################################
+#                                                                        #
+#                              VARIABLES                                 #
+#                                                                        #
+##########################################################################
+
+RD_OPTION_API_TOKEN=haafmGUzHKEdWDmjpzIlMdHLBGYw7kf8
+RUNDECK_API_URL=https://rundeck.corp.tander.ru:443/api/44
+RD_OPTION_RUNDECK_JOB_ID=df8d5fc8-2468-4bd5-93ad-43d0a6b3b286
+
+NAME=`cat /var/lib/postgresql/list_of_database.txt`
+for i in $NAME
+do
+   ENABLED=$(jq -r -c ".${i}.ENABLED" /var/lib/postgresql/list_of_database.json)
+   if [ "${ENABLED}" == "false" ]; then
+     sleep 1
+   else
+     echo ${i}
+     STANZA=$(jq -r -c ".${i}.STANZA" /var/lib/postgresql/list_of_database.json)
+     POSTGRES_VERSION=$(jq -r -c ".${i}.POSTGRES_VERSION" /var/lib/postgresql/list_of_database.json)
+     PROCESS_MAX=$(jq -r -c ".${i}.PROCESS_MAX" /var/lib/postgresql/list_of_database.json)
+     execution_output=$(curl --silent --location --request POST "${RUNDECK_API_URL}/job/${RD_OPTION_RUNDECK_JOB_ID}/run" \
+     --header "Accept: application/json" \
+     --header "Content-Type: application/json" \
+     --header "X-Rundeck-Auth-Token: ${RD_OPTION_API_TOKEN}" \
+     --data "{
+       \"options\": {
+           \"STANZA\": \"${STANZA}\",
+           \"POSTGRES_VERSION\": \"${POSTGRES_VERSION}\",
+           \"PROCESS_MAX\": \"${PROCESS_MAX}\"
+       }
+     }" | jq 'del(.description)')
+     HREF=`echo $execution_output | jq -r '.href'`
+     sleep 1
+
+     while :
+     do
+        WORKED_JOB_INFO=$(curl -s -f --location ${HREF} \
+        --header "Accept: application/json" \
+        --header "X-Rundeck-Auth-Token: ${RD_OPTION_API_TOKEN}" \
+        | jq 'del(.description)')
+        STATUS=`echo $WORKED_JOB_INFO | jq -r '.status'`
+        TMP=$(jq ".${i}.STATUS = \"${STATUS}\"" list_of_database.json)
+        echo "${TMP}" > list_of_database.json
+        echo $WORKED_JOB_INFO | jq -c '.'
+        echo -e "\n"
+        if [ "$STATUS" == "running" ]; then
+          sleep 30
+        elif [ "$STATUS" == "failed" ]; then
+          echo "job - NOK"
+	  break
+        else
+          echo "job - OK"
+          break
+        fi
+     done
+    fi
+done
+exit
